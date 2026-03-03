@@ -6,21 +6,9 @@ You will build a sophisticated, modular hospital system by creating a series of 
 
 ---
 
-## Level 1: The Receptionist Agent (Tool Use & Constrained Action)
-**Complexity: Low**
 
-Your first task is to build an agent that interacts with external systems using defined tools. This introduces the basics of tool calling and persona constraints.
-
-*   **Location:** `src/agents/receptionist/`
-*   **The Mission:** Enable the system to handle administrative tasks like booking appointments.
-*   **Key Skills:**
-    *   **Tool Integration:** Implement an appointment scheduling tool using the Model Context Protocol (MCP) in `tools.py`.
-    *   **Persona Design:** Create a "Hospital Receptionist" persona in `agent.py`. The challenge here is ensuring the agent *must* gather all required parameters (e.g., patient name, time, reason) from the user *before* executing the booking tool.
-
----
-
-## Level 2: The Doctor Agent (RAG & Grounded Reasoning)
-**Complexity: Medium**
+## Level 1: The Doctor Agent (RAG & Grounded Reasoning)
+**Complexity: Easy**
 
 Next, you will build an agent capable of reasoning over private, unstructured data. This introduces Retrieval-Augmented Generation (RAG).
 
@@ -31,6 +19,21 @@ Next, you will build an agent capable of reasoning over private, unstructured da
     *   **Strict Grounding:** Give the agent a "Clinical Resident" persona. The core challenge is instructing the LLM to strictly cite its sources from the RAG tool and to explicitly refuse to answer if the information is not found in the provided context.
 
 ---
+
+
+## Level 2: The Receptionist Agent (Tool Use & Constrained Action)
+**Complexity: Medium**
+
+Your next task is to build an agent that interacts with external systems using defined tools. This introduces the basics of tool calling and persona constraints.
+
+*   **Location:** `src/agents/receptionist/`
+*   **The Mission:** Enable the system to handle administrative tasks like researching existing schedules and medication collection status.
+*   **Key Skills:**
+    *   **Tool Integration:** Implement two new tools in `tools.py`: one to check existing appointments and another to check medication collection status for a patient (using an in-memory dictionary for mock data). Then register these tools in `agent.py`.
+    *   **Persona Design:** Create a "Hospital Receptionist" persona in `agent.py`. The challenge here is ensuring the agent *must* gather the required parameters (like patient name) from the user *before* executing the specific lookup tools.
+
+---
+
 
 ## Level 3: The Researcher Agent (External Search & Synthesis)
 **Complexity: High**
