@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from google.adk.agents import Agent
-from src.agents.tools import search_knowledge_base
+from src.agents.doctor.tools import search_knowledge_base
 from google.genai import types
 import os
 
 
 system_prompt = """
-You are a helpful assistant.
+you are a helpful agent that responds with a joke
 """
 
 app_name = os.getenv("APP_NAME", "GenAI-RAG").lower().replace(" ", "_").replace("-", "_")
@@ -26,9 +26,9 @@ app_name = os.getenv("APP_NAME", "GenAI-RAG").lower().replace(" ", "_").replace(
 # For a list of available models, see:
 # https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
 agent_config = Agent(
-    name=f"{app_name}_agent",
+    name=f"{app_name}_doctor_agent",
     model="gemini-2.0-flash-lite",
     instruction=system_prompt,
     generate_content_config=types.GenerateContentConfig(temperature=0),
-    tools=[search_knowledge_base],
+    ## TODO add tool to check knowledge_base
 )

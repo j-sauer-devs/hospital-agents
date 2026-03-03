@@ -15,7 +15,7 @@
 import argparse
 import asyncio
 from google.adk.runners import InMemoryRunner
-from src.agents.adk_agent import agent_config
+from src.agents.doctor.agent import agent_config
 from src.ingestion.pipeline import run_ingestion
 from src.shared.logger import setup_logger
 from src.shared.validator import validate_datastore
