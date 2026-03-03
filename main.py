@@ -15,7 +15,9 @@
 import argparse
 import asyncio
 from google.adk.runners import InMemoryRunner
-from src.agents.doctor.agent import agent_config
+from src.agents.doctor.agent import root_agent as doctor_agent
+from src.agents.receptionist.agent import root_agent as receptionist_agent
+from src.agents.master.agent import root_agent as master_agent
 from src.ingestion.pipeline import run_ingestion
 from src.shared.logger import setup_logger
 from src.shared.validator import validate_datastore
@@ -24,14 +26,25 @@ import os
 logger = setup_logger(__name__)
 app_name = os.getenv("APP_NAME", "GenAI-RAG")
 
+AGENTS = {
+    "doctor": doctor_agent,
+    "receptionist": receptionist_agent,
+    "master": master_agent,
+}
 
-def run_chat_mode():
-    logger.info("Initializing ADK Chat...")
 
-    print(f"--- {app_name} ADK Chatbot ---")
+def run_chat_mode(agent_name: str):
+    logger.info(f"Initializing ADK Chat with agent: {agent_name}...")
+
+    print(f"--- {app_name} ADK Chatbot ({agent_name}) ---")
     print("Type 'exit' to quit.")
     
-    runner = InMemoryRunner(agent=agent_config)
+    agent = AGENTS.get(agent_name)
+    if not agent:
+        logger.critical(f"Agent '{agent_name}' not found.")
+        return
+
+    runner = InMemoryRunner(agent=agent)
     
     # Use the ADK's built-in debug runner for interactive chat
     # This handles the user input loop.
@@ -52,6 +65,12 @@ def main():
         choices=["chat", "ingest"],
         required=True,
         help="The mode to run the application in.",
+    )
+    parser.add_argument(
+        "--agent",
+        choices=list(AGENTS.keys()),
+        default="doctor",
+        help="The agent to chat with (default: doctor).",
     )
     args = parser.parse_args()
 
@@ -74,8 +93,8 @@ def main():
         return
 
     if args.mode == "chat":
-        logger.info("Starting chat mode...")
-        run_chat_mode()
+        logger.info(f"Starting chat mode with agent: {args.agent}...")
+        run_chat_mode(args.agent)
     elif args.mode == "ingest":
         logger.info("Starting ingestion mode...")
         run_ingestion(input_dir="data/raw", output_dir="data/processed")
