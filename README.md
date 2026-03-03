@@ -1,8 +1,15 @@
-# Extensible RAG Agent with Vertex AI Search
+# Multi-Agent Hospital System with Vertex AI Search & ADK
 
-This repository provides a starting point for a Retrieval-Augmented Generation (RAG) system built on Google Cloud. It uses the Google Agent Development Kit (ADK) to create a conversational agent that can reason over unstructured data, like PDFs, indexed in Vertex AI Search.
+This project is a modular, multi-agent ecosystem built using the Google Agent Development Kit (ADK) and Vertex AI Search. It transforms a standard RAG prototype into a coordinated team of specialized agents designed to handle clinical, administrative, and research tasks within a hospital environment.
 
-The codebase is intended as a functional example that can be extended. It currently handles PDF ingestion and provides a basic chat interface, with `TODO` markers and challenges included to guide developers in enhancing its capabilities.
+## Architecture Overview
+
+The system transitions from a single chatbot to a hierarchy of specialized personas:
+
+*   **🩺 The Doctor Agent:** A clinical resident specialist. It uses RAG to reason over private medical records and provide grounded, cited answers.
+*   **🗓️ The Receptionist Agent:** An administrative specialist. It uses the Model Context Protocol (MCP) to manage appointment scheduling and check availability.
+*   **🔬 The Researcher Agent:** An academic explorer. It synthesizes local patient data with global medical research using Google Search and multi-agent synthesis.
+*   **👑 The Master Orchestrator ("Final Boss"):** The system's triage specialist. It analyzes user intent and delegates tasks to the appropriate sub-agent using Agent-as-a-Tool (A2A) integration.
 
 ---
 
@@ -10,40 +17,46 @@ The codebase is intended as a functional example that can be extended. It curren
 
 The application operates in two primary modes:
 
-1.  **Ingestion (`--mode ingest`):** This mode processes unstructured documents from a local directory. By default, it looks for PDF files, extracts their text content, and splits the text into smaller segments called chunks. The default chunking strategy is a naive, fixed-size sliding window that breaks text every 1000 characters with a 100-character overlap. This simple method is provided as a starting point, and a key challenge is to replace it with a more context-aware approach (see `CHALLENGE.md`). These chunks are then uploaded to a Vertex AI Search data store.
-
-2.  **Chat (`--mode chat`):** This mode launches an interactive command-line interface where you can ask questions. The agent takes your query, searches the indexed documents in Vertex AI Search for relevant chunks, and uses a large language model (LLM) to generate a response based on the retrieved information.
+1.  **Ingestion (`--mode ingest`):** Processes unstructured documents (PDFs) from `data/raw/`, parses them, and indexes them into a Vertex AI Search data store for use by the Doctor and Researcher agents.
+2.  **Chat (`--mode chat`):** Launches an interactive CLI. You can now specify which agent you want to converse with using the `--agent` flag.
 
 ---
 
 ## Key Commands
 
-Here is a summary of the most important commands for setting up and running the project.
-
-### Makefile Commands
+### Setup
 -   `make install`: Installs all project dependencies using Poetry.
--   `make infra`: A convenience command that runs all infrastructure setup steps in sequence (permissions, datastore, engine, GCS bucket).
--   `make check`: Checks poetry lock file consistency.
+-   `make infra`: Provisions required GCP infrastructure (Data Store, Engine, GCS Buckets).
 
-### Application Commands
--   `poetry run python main.py --mode ingest`: Runs the ingestion pipeline to process raw documents and load them into Vertex AI Search.
--   `poetry run python main.py --mode chat`: Starts the interactive chat session with the RAG agent.
--   `poetry run python scripts/run_evaluation.py`: Runs the evaluation script to measure the agent's performance against a golden dataset.
+### Running the Application
+- **Ingest Data:**
+    ```bash
+    poetry run python main.py --mode ingest
+    ```
+- **Chat via Web UI (Recommended):**
+    This launches a local web-based playground where you can select between different agents (Doctor, Receptionist, etc.) and view tool calls in real-time.
+    ```bash
+    poetry run adk web src/agents
+    ```
+- **Chat via CLI:**
+    ```bash
+    # Chat with the Doctor (Default)
+    poetry run python main.py --mode chat --agent doctor
+
+    # Chat with the Receptionist
+    poetry run python main.py --mode chat --agent receptionist
+    ```
+
+-   **Evaluate Performance:**
+    ```bash
+    poetry run python scripts/run_evaluation.py
+    ```
 
 ---
 
-## Optional & Repurposable Commands
-
-The following scripts are not required for the basic workflow but can be altered or repurposed for custom use cases.
-
--   `make generate-data`: Generates synthetic medical records for testing. You can modify `scripts/generate_data.py` to create different types of data.
--   `poetry run python scripts/generate_golden_dataset.py`: Creates a structured evaluation dataset from the raw data. You can adapt this script to build custom datasets for measuring performance on specific tasks.
-
----
 ## Project Documentation
 
-For detailed information, please refer to the following documents:
-
--   **[SETUP.md](./SETUP.md):** A comprehensive guide to install, configure, and run the project.
--   **[CHALLENGE.md](./CHALLENGE.md):** A guide for developers looking to extend the project's functionality, with specific challenges for 
--   **[INFRASTRUCTURE_SETUP.md](./INFRASTRUCTURE_SETUP.md):** A step-by-step guide to provision the necessary Google Cloud resources.
+-   **[AGENT_ARCHITECTURE.md](./AGENT_ARCHITECTURE.md):** Detailed technical breakdown of the multi-agent flow and A2A integration.
+-   **[SETUP.md](./SETUP.md):** Guide for installation and configuration.
+-   **[INFRASTRUCTURE_SETUP.md](./INFRASTRUCTURE_SETUP.md):** Step-by-step GCP resource provisioning.
+-   **[task-tracker.md](./task-tracker.md):** Current progress of the system migration.

@@ -1,97 +1,57 @@
-# Project Migration Challenge: Building a Multi-Agent Hospital System
+# The Multi-Agent Hospital Challenge
 
-Welcome to the migration challenge. This guide outlines the transformation of our single-agent RAG prototype into a sophisticated, modular multi-agent ecosystem. Your mission is to re-engineer the system into a coordinated team of specialized agents.
+Welcome to the Multi-Agent Hospital Challenge! This guide is designed to take you on a learning journey through the Google Agent Development Kit (ADK). 
 
-**The Goal:** Create a scalable hospital assistant with a **Medical Expert**, an **Administrative Receptionist**, and a **Deep Researcher**, all managed by a **Master Orchestrator**.
-
----
-
-## Challenge 1: Codebase Sanitization (A Clean Slate)
-
-First, let's clear out the old scaffolding to make way for the new architecture.
-
-*   **Task:** Scan all files in the `src/` directory and remove every comment and code block tagged with `# TODO: HACKATHON CHALLENGE`.
-*   **Task:** Once sanitized, this `CHALLENGE.md` file will be deleted, as its purpose will be fulfilled.
+You will build a sophisticated, modular hospital system by creating a series of specialized agents. We have structured this challenge to progress from **least complex to most complex**, allowing you to incrementally build your skills in agent design, tool integration, and orchestration.
 
 ---
 
-## Challenge 2: Architecting the Agent Squad (Directory Restructure)
+## Level 1: The Receptionist Agent (Tool Use & Constrained Action)
+**Complexity: Low**
 
-To ensure each agent can be developed in isolation, we need to restructure the `src/agents/` directory.
-
-**Your Goal:**
-Create a modular directory structure that houses each agent's unique persona and toolset.
-
-**Where to Hack:**
-*   Create the following subdirectories inside `src/agents/`:
-    ```text
-    src/agents/
-    ├── doctor/
-    ├── receptionist/
-    ├── researcher/
-    └── master/
-    ```
-
----
-
-## Challenge 3: Building the Specialists (Agent Development)
-
-Now it's time to build the core of our new system: the specialized agents.
-
-### Part A: The Doctor Agent (The RAG Specialist)
-
-Transform the existing agent into a medical reasoning expert.
-
-*   **Location:** `src/agents/doctor/`
-*   **Task 1 (Tool Migration):** Move the existing `search_knowledge_base` tool logic into a new `src/agents/doctor/tools.py`.
-*   **Task 2 (Persona Upgrade):** Create an `agent.py` in the directory and give it a high-fidelity "Clinical Resident" persona. The new instructions must prioritize grounding—strictly citing sources from the RAG tool and explicitly stating when information is missing.
-
-### Part B: The Receptionist Agent (The Action Taker)
-
-Enable the system to interact with external administrative systems.
+Your first task is to build an agent that interacts with external systems using defined tools. This introduces the basics of tool calling and persona constraints.
 
 *   **Location:** `src/agents/receptionist/`
-*   **Task 1 (MCP Implementation):** Implement a new tool in `src/agents/receptionist/tools.py` for appointment scheduling. You'll need to use the **Model Context Protocol (MCP)** libraries already in the environment.
-*   **Task 2 (Persona Focus):** Define a "Hospital Receptionist" persona in `agent.py` focused on gathering missing information (e.g., `patient_name`, `appointment_time`) from the user before executing a tool call.
+*   **The Mission:** Enable the system to handle administrative tasks like booking appointments.
+*   **Key Skills:**
+    *   **Tool Integration:** Implement an appointment scheduling tool using the Model Context Protocol (MCP) in `tools.py`.
+    *   **Persona Design:** Create a "Hospital Receptionist" persona in `agent.py`. The challenge here is ensuring the agent *must* gather all required parameters (e.g., patient name, time, reason) from the user *before* executing the booking tool.
 
-### Part C: The Researcher Agent (The Academic Explorer)
+---
 
-Bridge the gap between the hospital’s private data and global clinical knowledge.
+## Level 2: The Doctor Agent (RAG & Grounded Reasoning)
+**Complexity: Medium**
+
+Next, you will build an agent capable of reasoning over private, unstructured data. This introduces Retrieval-Augmented Generation (RAG).
+
+*   **Location:** `src/agents/doctor/`
+*   **The Mission:** Transform this agent into a medical reasoning expert that answers questions based on the hospital's private records.
+*   **Key Skills:**
+    *   **RAG Integration:** Connect the `search_knowledge_base` tool to Vertex AI Search.
+    *   **Strict Grounding:** Give the agent a "Clinical Resident" persona. The core challenge is instructing the LLM to strictly cite its sources from the RAG tool and to explicitly refuse to answer if the information is not found in the provided context.
+
+---
+
+## Level 3: The Researcher Agent (External Search & Synthesis)
+**Complexity: High**
+
+Now, bridge the gap between internal hospital data and global knowledge. This agent must use multiple tools and synthesize complex information.
 
 *   **Location:** `src/agents/researcher/`
-*   **Task 1 (External Tooling):** Implement a tool in `src/agents/researcher/tools.py` that interfaces with Google Search (via Vertex AI Search or a public search API).
-*   **Task 2 (Persona Focus):** Create a "Medical Researcher" persona in `agent.py` that can synthesize internal data with external search results to answer technical queries.
+*   **The Mission:** Build an academic explorer that can compare local patient trends against global medical research.
+*   **Key Skills:**
+    *   **External Tooling:** Implement a tool that interfaces with Google Search (via the `google-genai` SDK or a public API) to map contemporary medical literature.
+    *   **Multi-Tool Synthesis:** The agent must be able to use *both* the internal RAG tool (to find local trends) and the external search tool (to find global context), synthesizing the results into a cohesive research summary.
 
 ---
 
-## Challenge 4: Assembling the Team (The Master Orchestrator)
+## Level 4: The Master Orchestrator ("The Final Boss")
+**Complexity: Expert**
 
-With the specialists built, it's time to create the "Final Boss"—the primary interface that manages task delegation.
+With your team of specialists built, you must now build the intelligence that manages them. This introduces the concept of Agent-to-Agent (A2A) orchestration.
 
-**Your Goal:**
-Build a master agent that uses the other agents as tools, intelligently routing user requests to the correct specialist.
-
-**Where to Hack:**
-*   **`src/agents/master/agent.py`**:
-    *   **Task 1 (A2A Integration):** Create the master agent configuration. Use the ADK's **Agent-as-a-Tool** feature to pass the Doctor, Receptionist, and Researcher agents into its `tools` parameter.
-    *   **Task 2 (Triage Logic):** Define instructions for the Master Agent to act as a **Triage Specialist**. It must determine user intent and delegate the query to the correct sub-agent.
-
----
-
-## Challenge 5: Polishing the System (Docs & Finalization)
-
-The final step is to update all documentation and configuration to reflect the new multi-agent architecture.
-
-**Tasks:**
-
-1.  **Documentation Overhaul:**
-    *   **`README.md`:** Rewrite the "How It Works" section to explain the new Orchestrator/sub-agent interaction.
-    *   **`AGENT_ARCHITECTURE.md`:** Create this new file to detail the Agent-to-Agent (A2A) flow and how the Master Agent uses sub-agents as tools.
-
-2.  **Infrastructure & Setup:**
-    *   **`INFRASTRUCTURE_SETUP.md`:** Revise the guide to include any new environment variables required for the Receptionist's MCP tools or the Researcher's search tools.
-    *   **`.env.example`:** Update the template to include placeholders for `ENGINE_ID` and any new API keys, ensuring they are marked as required.
-
-3.  **Finalizing the Entrypoint:**
-    *   **`main.py`:** Update the application's entrypoint to import and run the `master_agent` from `src.agents.master.agent`.
-    *   **Verification:** Ensure the `InMemoryRunner` initializes the multi-agent loop correctly, allowing the Master Agent to call sub-agents without crashing.
+*   **Location:** `src/agents/master/`
+*   **The Mission:** Build a primary interface that acts as a Triage Specialist, routing user requests to the correct sub-agent.
+*   **Key Skills:**
+    *   **Agent-as-a-Tool (A2A):** Use the ADK to register the Doctor, Receptionist, and Researcher agents as `tools` available to the Master Agent.
+    *   **Routing Logic:** Design system instructions that allow the Master Agent to accurately determine user intent, delegate the task, and seamlessly pass the response back to the user without losing context.
