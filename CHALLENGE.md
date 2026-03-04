@@ -58,3 +58,18 @@ With your team of specialists built, you must now build the intelligence that ma
 *   **Key Skills:**
     *   **Agent-as-a-Tool (A2A):** Use the ADK to register the Doctor, Receptionist, and Researcher agents as `tools` available to the Orchestrator Agent.
     *   **Routing Logic:** Design system instructions that allow the Orchestrator Agent to accurately determine user intent, delegate the task, and seamlessly pass the response back to the user without losing context.
+
+---
+
+## Level 5: The Emergency Agent (Live System Interaction)
+**Complexity: Master**
+
+This final challenge moves beyond internal data and simple APIs to interacting with a live, stateful, external system. You will build an agent that can manage a hospital-wide emergency by connecting to a mock Hospital Information System (HIS).
+
+*   **Location:** `src/agents/emergency/`
+*   **The Mission:** Build an automated crisis coordinator. This agent must connect to the running HIS server to monitor hospital status, triage incoming patients based on real-time data (like bed capacity), and dispatch the appropriate on-call staff to where they are needed most.
+*   **Key Skills:**
+    *   **External System Integration:** The first step is to set up and run the external HIS server (via Docker or Cloud Run), and then configure your agent to use it as its primary tool.
+    *   **Stateful Reasoning:** The agent's core logic must be able to check the state of the hospital *before* taking an action. For example, it must check `his://live/bed-capacity` before deciding to `triage_patient`.
+    *   **Chain-of-Thought Planning:** In a complex emergency, the agent must make a series of decisions in a logical order. For example: check beds, check blood supply, dispatch staff, *then* begin triaging new arrivals.
+    *   **Crisis Persona Design:** The agent's instructions are critical. It needs the persona of a calm, decisive, and efficient hospital emergency manager to reason correctly under pressure.
