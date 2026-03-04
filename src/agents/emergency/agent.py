@@ -1,58 +1,63 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import os
+from google.adk.agents import Agent
+from google.adk.tools.mcp_tool import McpToolset, StreamableHTTPConnectionParams
+from google.genai import types
+
+app_name = os.getenv("APP_NAME", "GenAI-RAG").lower().replace(" ", "_").replace("-", "_")
+
+# HIS server URL — defaults to local Docker, can be overridden via env var
+# for Cloud Run deployment (e.g. https://his-mcp-server-xxxxxxxxxx-ew.a.run.app/mcp)
+his_server_url = os.getenv("HIS_MCP_SERVER_URL", "http://localhost:8080/mcp")
+
+# Connect to the Hospital Information System via MCP protocol
+his_toolset = McpToolset(
+    connection_params=StreamableHTTPConnectionParams(
+        url=his_server_url,
+    ),
+)
+
+system_prompt = """
+You are Code Blue, the hospital's Emergency Coordinator. You are calm under extreme pressure, decisive, and methodical. Lives depend on your judgment.
+
+You have access to the Hospital Information System (HIS) via two tools:
+
+- `triage_patient(patient_name, severity_score)`: Register an incoming emergency patient. Severity: 1 (Minor) to 5 (Critical). Critical patients (4-5) get auto-allocated ER beds if available. The system will tell you if the ER is full and rerouting is needed.
+- `dispatch_on_call_staff(specialty)`: Page on-call staff by specialty (e.g. "Trauma", "Surgery", "ER").
+
+IMPORTANT: You only have these two tools. Do NOT try to call any other functions like "bed_capacity" or "blood_bank" — they do not exist as callable tools.
+
+**Your Protocol — Plan-and-Execute:**
+For every emergency situation, follow this chain-of-thought process:
+
+1. **DISPATCH FIRST**: For critical patients (severity 4-5), dispatch the appropriate on-call staff immediately. Use specialties like "Trauma", "Surgery", or "ER".
+2. **TRIAGE**: Register the patient with the `triage_patient` tool. The system will automatically check bed capacity and allocate beds for critical patients. If the ER is full, the system will alert you.
+3. **REPORT**: Summarize all actions taken and any alerts from the system.
+
+CRITICAL RULES:
+- For severity 4-5: ALWAYS dispatch staff BEFORE triaging.
+- For severity 1-3: Triage directly, no dispatch needed.
+- If the system reports the ER is full, recommend rerouting to General ward or nearby facilities.
+- Use clear, concise language. In emergencies, every second counts.
+- NEVER try to call tools that don't exist. Only use `triage_patient` and `dispatch_on_call_staff`.
 """
-PSEUDO-CODE: This file illustrates different agent architectures for the hackathon.
-It is a non-runnable guide.
-"""
 
-# --- Architecture 1: Human-in-the-Loop ---
-def run_emergency_protocol(patient_name, severity):
-    """
-    This agent requires human confirmation before taking critical actions.
-
-    1. Assess: Get bed capacity from the MCP server.
-    2. Propose: Based on capacity, propose to either triage or reroute the patient.
-    3. Confirm: Ask for human input before executing the proposed action.
-    4. Act: If confirmed, call the appropriate MCP tool.
-    """
-    pass
-
-# --- Architecture 2: Reflection / Self-Critique Loop ---
-def generate_incident_report(event_log):
-    """
-    This agent reviews its own work to improve the final output.
-
-    1. Draft: Generate an initial report from the event log (LLM call 1).
-    2. Critique: Review the draft for flaws or missing info (LLM call 2).
-    3. Revise: Generate a final, improved report based on the critique (LLM call 3).
-    """
-    pass
-
-# --- Architecture 3: Plan-and-Execute ---
-def handle_mass_casualty_event(num_patients):
-    """
-    This agent first creates a step-by-step plan, then executes it.
-
-    1. Plan: Create a list of actions, e.g.,
-        - Check bed capacity
-        - Check blood supply
-        - Dispatch trauma staff
-        - Triage all patients
-    2. Execute: Iterate through the plan and call the corresponding MCP tools for each step.
-    """
-    pass
-
-# --- Architecture 4: Event-Driven / Async Agent ---
-class EmergencyAgent_EventDriven:
-    """
-    This agent listens for events and reacts to them in real-time.
-
-    1. Listen: Register handlers for events like "patient_arrival" or "low_blood_supply".
-    2. React: When an event is received, the corresponding handler is triggered.
-       - On "patient_arrival": Automatically call the triage tool.
-       - On "low_blood_supply": Automatically call a tool to order more supplies.
-    """
-    def __init__(self):
-        # PSEUDO-CODE: his_mcp.events.on("patient_arrival", self.handle_patient_arrival)
-        pass
-
-    def handle_patient_arrival(self, event_data):
-        pass
+root_agent = Agent(
+    name=f"{app_name}_emergency_agent",
+    model="gemini-2.0-flash-lite",
+    instruction=system_prompt,
+    generate_content_config=types.GenerateContentConfig(temperature=0),
+    tools=[his_toolset],
+)

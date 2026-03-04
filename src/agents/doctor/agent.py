@@ -36,6 +36,7 @@ app_name = os.getenv("APP_NAME", "GenAI-RAG").lower().replace(" ", "_").replace(
 # https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
 root_agent = Agent(
     name=f"{app_name}_doctor_agent",
+    description="Answers medical questions about patients by searching hospital records. Returns detailed patient info including vitals, diagnoses, medications, and treatment plans.",
     model="gemini-2.0-flash-lite",
     instruction=system_prompt,
     generate_content_config=types.GenerateContentConfig(temperature=0),

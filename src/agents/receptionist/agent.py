@@ -44,6 +44,7 @@ app_name = os.getenv("APP_NAME", "GenAI-RAG").lower().replace(" ", "_").replace(
 # https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
 root_agent = Agent(
     name=f"{app_name}_receptionist_agent",
+    description="Handles scheduling and logistics. Can check existing appointments, book new ones, view available slots, and check medication collection status. Returns specific dates, times, and status details.",
     model="gemini-2.0-flash-lite",
     instruction=system_prompt,
     tools=[view_available_slots, book_appointment, check_existing_appointments, medication_collection_status],
