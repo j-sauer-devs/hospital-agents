@@ -32,6 +32,20 @@ SCHEDULE = {
 }
 ALL_SLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"]
 
+# In-memory "database" for existing patient appointments.
+PATIENT_APPOINTMENTS = {
+    "Albert Johnson": [{"date": "2026-03-04", "time": "10:00", "reason": "Follow-up for hypertension"}],
+    "Maria Garcia": [{"date": "2026-03-05", "time": "09:00", "reason": "Annual physical exam"}],
+    "James Wilson": [{"date": "2026-03-05", "time": "11:00", "reason": "Lab results review"}],
+}
+
+# In-memory "database" for medication collection status.
+MEDICATION_STATUS = {
+    "Albert Johnson": {"medication": "Sumatriptan 50mg", "status": "pending"},
+    "Maria Garcia": {"medication": "Metformin 500mg", "status": "collected"},
+    "James Wilson": {"medication": "Lisinopril 10mg", "status": "not collected"},
+}
+
 
 @mcp.tool()
 def view_available_slots(booking_date: date):
@@ -90,11 +104,44 @@ def book_appointment(booking_date: date, time: str, patient_name: str, reason: s
     # In a real system, we would also save the patient_name and reason.
     return {"status": "confirmed", "message": confirmation_msg}
 
-#TODO: Add a tool to check existing appointments for a patient, and another tool to check medication collection status (if we want the receptionist to handle that as well)
-#HINT: For checking existing appointments, you could maintain another in-memory "database" that maps patient names to their appointments. The tool would query this database to return the patient's upcoming appointments.
+@mcp.tool()
+def check_existing_appointments(patient_name: str):
+    """Checks existing appointments for a given patient.
 
-#TODO: Add a tool to check the status of medication collection for a patient. This would involve maintaining another in-memory "database" that tracks medication collection status, and the tool would query this database to provide the necessary information.
-#HINT: You could create a dictionary that maps patient names to their medication collection status (e.g., "collected", "pending", "not collected"). The tool would take the patient's name as input and return their medication collection status based on this dictionary.
+    Args:
+        patient_name: The full name of the patient to look up.
+
+    Returns:
+        A dictionary containing the patient's upcoming appointments or a message if none are found.
+    """
+    logger.info(f"--- 🛠️ Tool: check_existing_appointments called for patient: {patient_name} ---")
+    appointments = PATIENT_APPOINTMENTS.get(patient_name)
+    if appointments:
+        logger.info(f"✅ Found {len(appointments)} appointment(s) for {patient_name}")
+        return {"patient": patient_name, "appointments": appointments}
+    else:
+        logger.info(f"ℹ️ No appointments found for {patient_name}")
+        return {"patient": patient_name, "message": f"No existing appointments found for {patient_name}."}
+
+
+@mcp.tool()
+def medication_collection_status(patient_name: str):
+    """Checks the medication collection status for a given patient.
+
+    Args:
+        patient_name: The full name of the patient to look up.
+
+    Returns:
+        A dictionary containing the patient's medication name and collection status, or a message if no records are found.
+    """
+    logger.info(f"--- 🛠️ Tool: medication_collection_status called for patient: {patient_name} ---")
+    status = MEDICATION_STATUS.get(patient_name)
+    if status:
+        logger.info(f"✅ Medication status for {patient_name}: {status['medication']} - {status['status']}")
+        return {"patient": patient_name, "medication": status["medication"], "status": status["status"]}
+    else:
+        logger.info(f"ℹ️ No medication records found for {patient_name}")
+        return {"patient": patient_name, "message": f"No medication records found for {patient_name}."}
 
 if __name__ == "__main__":
     port = int(os.getenv("RECEPTIONIST_PORT", 8081))
