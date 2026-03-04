@@ -20,9 +20,12 @@ search_client = VertexSearchClient()
 
 def search_knowledge_base(query: str) -> str:
     """Searches the knowledge base to find information to answer user questions.
+    This tool MUST be called for every user question before responding.
 
     Args:
         query: A detailed search query crafted from the user's question.
     """
     logger.info(f"Tool call: search_knowledge_base with query: {query}")
-    return search_client.search(query)
+    result = search_client.search(query)
+    logger.info(f"Search result length: {len(result)} chars, preview: {result[:200]}")
+    return result
