@@ -14,6 +14,83 @@ The system transitions from a single chatbot to a hierarchy of specialized perso
 
 ---
 
+## 🎮 Demo
+
+### Level 1 — Doctor Agent (RAG & Grounded Reasoning)
+> Clinical resident that searches hospital records via Vertex AI Search to provide grounded, cited medical answers.
+
+<details>
+<summary>📹 Watch demo</summary>
+<br>
+<img src="docs/assets/Level-1/Level-1-recording.gif" alt="Level 1 - Doctor Agent demo" width="600">
+</details>
+
+<p>
+<img src="docs/assets/Level-1/Level-1-screenshot.png" alt="Level 1 - Doctor Agent screenshot" width="600">
+</p>
+
+---
+
+### Level 2 — Receptionist Agent (Appointments & Medication Tools)
+> Hospital receptionist that manages appointments, checks schedules, and tracks medication collection status.
+
+<details>
+<summary>📹 Watch demo</summary>
+<br>
+<img src="docs/assets/Level-2/Level-2-recording.gif" alt="Level 2 - Receptionist Agent demo" width="600">
+</details>
+
+<p>
+<img src="docs/assets/Level-2/Level-2-screenshot.png" alt="Level 2 - Receptionist Agent screenshot" width="600">
+</p>
+
+---
+
+### Level 3 — Researcher Agent (Multi-Tool Academic Explorer)
+> Academic explorer that synthesizes internal hospital data with global medical literature via Google Search.
+
+<details>
+<summary>📹 Watch demo</summary>
+<br>
+<img src="docs/assets/Level-3/Level-3-recording.gif" alt="Level 3 - Researcher Agent demo" width="600">
+</details>
+
+<p>
+<img src="docs/assets/Level-3/Level-3-screenshot.png" alt="Level 3 - Researcher Agent screenshot" width="600">
+</p>
+
+---
+
+### Level 4 — Orchestrator Agent (Multi-Agent Triage Coordinator)
+> Nurse Atlas — a triage specialist that routes requests to Doctor, Receptionist, and Researcher sub-agents using Agent-as-a-Tool.
+
+<details>
+<summary>📹 Watch demo</summary>
+<br>
+<img src="docs/assets/Level-4/Level-4-recording.gif" alt="Level 4 - Orchestrator Agent demo" width="600">
+</details>
+
+<p>
+<img src="docs/assets/Level-4/Level-4-screenshot.png" alt="Level 4 - Orchestrator Agent screenshot" width="600">
+</p>
+
+---
+
+### Level 5 — Emergency Agent (Crisis Management via MCP)
+> Code Blue coordinator that connects to a live Hospital Information System via MCP to triage patients and dispatch staff.
+
+<details>
+<summary>📹 Watch demo</summary>
+<br>
+<img src="docs/assets/Level-5/Level-5-recording.gif" alt="Level 5 - Emergency Agent demo" width="600">
+</details>
+
+<p>
+<img src="docs/assets/Level-5/Level-5-screenshot.png" alt="Level 5 - Emergency Agent screenshot" width="600">
+</p>
+
+---
+
 ## How It Works
 
 The application operates in two primary modes:
