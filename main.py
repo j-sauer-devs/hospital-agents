@@ -18,6 +18,7 @@ from google.adk.runners import InMemoryRunner
 from src.agents.doctor.agent import root_agent as doctor_agent
 from src.agents.receptionist.agent import root_agent as receptionist_agent
 from src.agents.orchestrator.agent import root_agent as orchestrator_agent
+from src.agents.researcher.agent import root_agent as researcher_agent
 from src.ingestion.pipeline import run_ingestion
 from src.shared.logger import setup_logger
 from src.shared.validator import validate_datastore
@@ -30,6 +31,7 @@ AGENTS = {
     "doctor": doctor_agent,
     "receptionist": receptionist_agent,
     "orchestrator": orchestrator_agent,
+    "researcher": researcher_agent,
 }
 
 
