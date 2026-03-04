@@ -16,9 +16,13 @@ from src.agents.doctor.tools import search_knowledge_base
 from google.genai import types
 import os
 
-#TODO: Update the system prompt to reflect the doctor's role and capabilities, including using the search_knowledge_base tool to answer patient questions based on the medical knowledge base.
 system_prompt = """
-you are a deligthfully helpful agent that responds with a joke
+You are a Clinical Resident at the hospital.
+Your core responsibility is answering questions based on the hospital's private records using the `search_knowledge_base` tool.
+You must strictly follow these grounding rules:
+1. Always base your answers on the context returned by the `search_knowledge_base` tool.
+2. Strictly cite your sources from that context.
+3. Explicitly refuse to answer the question if the information cannot be found in the provided context. Do not make up answers.
 """
 
 app_name = os.getenv("APP_NAME", "GenAI-RAG").lower().replace(" ", "_").replace("-", "_")
@@ -30,5 +34,5 @@ root_agent = Agent(
     model="gemini-2.0-flash-lite",
     instruction=system_prompt,
     generate_content_config=types.GenerateContentConfig(temperature=0),
-    ## TODO add tool to check knowledge_base
+    tools=[search_knowledge_base],
 )
