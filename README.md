@@ -14,7 +14,7 @@ The system transitions from a single chatbot to a hierarchy of specialized perso
 
 ---
 
-## 🎮 Demo
+## 🎮 Demo Results
 
 ### Level 1 — Doctor Agent (RAG & Grounded Reasoning)
 > Clinical resident that searches hospital records via Vertex AI Search to provide grounded, cited medical answers.
